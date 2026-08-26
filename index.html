@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Yuchen — AI Agent / FinTech Engineer</title>
+<meta name="description" content="金融背景+ AI Agent 工程师。Evo-FinAgent：用 harness engineering 思路搭建的金融投研 Multi-Agent 系统。">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Serif:ital,wght@0,400;0,500;0,600;1,400&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<nav class="topnav">
+  <a href="#top" class="brand">YC</a>
+  <div class="nav-links">
+    <a href="#about">关于</a>
+    <a href="#skills">能力</a>
+    <a href="#project">项目</a>
+    <a href="#contact">联系</a>
+  </div>
+</nav>
+
+<!-- ============ HERO ============ -->
+<header id="top" class="hero">
+  <div class="hero-inner">
+    <p class="eyebrow">AI Agent Engineer · FinTech</p>
+    <h1>先证明每一步都对，<br>再让它自动跑。</h1>
+    <p class="hero-sub">
+      Evo-FinAgent —— 一个用 <em>harness engineering</em> 思路搭建的
+      金融投研 Multi-Agent 系统。每一次检索、每一次重试、每一分钱成本，
+      都留痕、可审计、可复现。
+    </p>
+    <div class="hero-cta">
+      <a href="#project" class="btn btn-primary">查看项目</a>
+      <a href="https://evofinagent-yuchen027.streamlit.app/" target="_blank" rel="noopener" class="btn btn-ghost">在线 Demo ↗</a>
+    </div>
+  </div>
+
+  <div class="ledger" aria-label="真实运行日志片段">
+    <div class="ledger-head">
+      <span class="dot dot-red"></span><span class="dot dot-amber"></span><span class="dot dot-green"></span>
+      <span class="ledger-title">run_agent.py · AAPL · trace</span>
+    </div>
+    <pre class="ledger-body"><span class="ln"><span class="node">collector</span><span class="ok">ok</span>  1.82s   8/8 指标命中</span>
+<span class="ln"><span class="node">analyst</span> <span class="ok">ok</span>  6.76s   $0.000198   prompt v7</span>
+<span class="ln"><span class="node">risk</span>    <span class="ok">ok</span> 27.98s   $0.003025   40/40 风险标题覆盖</span>
+<span class="ln"><span class="node">writer</span>  <span class="ok">ok</span>  2.03s   $0.000164   0 处无法溯源</span>
+<span class="ln highlight"><span class="node">finalize</span><span class="approved">approved</span>  人工审核通过 · 已留痕</span></pre>
+  </div>
+</header>
+
+<!-- ============ ABOUT ============ -->
+<section id="about" class="section about">
+  <div class="section-inner">
+    <p class="section-label">关于我</p>
+    <div class="about-grid">
+      <p class="about-lead">
+        金融科班出身，CFA 二级持证。在把这套知识用来读懂 10-K
+        和财务模型之外，我现在把它用来<strong>判断一个 AI Agent
+        的输出到底靠不靠谱</strong>——这正是我在做 AI Agent 开发时，
+        比纯工程背景的人多出来的那一层判断力。
+      </p>
+      <p class="about-detail">
+        目前在新加坡寻找 AI Agent / 应用开发、FinTech 技术岗、
+        或 Forward Deployed Engineer 方向的实习机会。Evo-FinAgent
+        是我从零搭建的第一个工程化 Agent 项目，过程中的每一次踩坑
+        和修复都记在了项目的
+        <a href="https://github.com/hyc1054432995/EvoFinAgent/blob/main/docs/ENGINEERING_LOG.md" target="_blank" rel="noopener">工程日志</a>
+        里——那里比这页更能说明我是怎么工作的。
+      </p>
+    </div>
+  </div>
+</section>
+
+<!-- ============ SKILLS ============ -->
+<section id="skills" class="section skills">
+  <div class="section-inner">
+    <p class="section-label">能力构成</p>
+    <h2 class="section-title">两边都懂，是我的护城河</h2>
+
+    <div class="skills-grid">
+      <div class="skills-col">
+        <h3>金融</h3>
+        <ul>
+          <li>CFA Level II</li>
+          <li>财务报表分析 · 估值建模</li>
+          <li>SEC XBRL 数据结构与口径</li>
+          <li>风险因素识别（10-K Item 1A）</li>
+        </ul>
+      </div>
+
+      <div class="skills-meet" aria-hidden="true">
+        <span>×</span>
+      </div>
+
+      <div class="skills-col">
+        <h3>工程</h3>
+        <ul>
+          <li>LangGraph · Multi-Agent 编排</li>
+          <li>Harness Engineering（重试 / 熔断 / 成本护栏）</li>
+          <li>评测体系设计（rubric + LLM-judge + 回归集）</li>
+          <li>Python · Docker · Git · Streamlit</li>
+        </ul>
+      </div>
+    </div>
+
+    <p class="skills-note">
+      这两栏不是两份独立的技能清单——项目里那些只有金融背景才能发现的
+      bug（少数股东权益导致的会计恒等式假告警、税前利润不能替代营业利润、
+      ROE 归因方向错误），正是这两边交叉的地方。
+    </p>
+  </div>
+</section>
+
+<!-- ============ PROJECT ============ -->
+<section id="project" class="section project">
+  <div class="section-inner">
+    <p class="section-label">主打项目</p>
+    <h2 class="section-title">Evo-FinAgent</h2>
+    <p class="project-sub">
+      基于 LangGraph 与 Harness 治理的企业级金融投研 Multi-Agent 系统
+    </p>
+
+    <div class="project-body">
+      <div class="project-text">
+        <p>
+          输入一个美股 ticker，四个节点（数据采集 → 财务分析 → 风险抽取 →
+          报告撰写）协同产出一份带估值分析和风险提示的投研报告，全程
+          可审计、可断点续跑、带人工审核卡点。
+        </p>
+        <p>
+          财务数字直接取自 SEC XBRL 官方申报，不经过 LLM 推算；
+          风险因素逐条附原文依据，可回溯核验；执行摘要里出现的每一个
+          数字都会经过溯源校验，查不到出处就会被标记为潜在幻觉。
+        </p>
+
+        <div class="stamp-wrap">
+          <div class="stamp">APPROVED</div>
+          <p class="stamp-caption">
+            人工审核不是摆设——流程会真的在这一步中断，
+            存档等待决定，你可以在 Demo 里亲手点一次。
+          </p>
+        </div>
+      </div>
+
+      <div class="project-stats">
+        <div class="stat">
+          <span class="stat-num">34</span>
+          <span class="stat-label">评测任务<br>10 个行业 + 4 类边界情况</span>
+        </div>
+        <div class="stat">
+          <span class="stat-num">27/27</span>
+          <span class="stat-label">组件级评测<br>零成本、35 秒跑完</span>
+        </div>
+        <div class="stat">
+          <span class="stat-num">v2→v7</span>
+          <span class="stat-label">提示词迭代实验<br>0%→100% 目标达标率</span>
+        </div>
+        <div class="stat">
+          <span class="stat-num">100%</span>
+          <span class="stat-label">风险条目<br>evidence 可溯源至原文</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="project-links">
+      <a href="https://evofinagent-yuchen027.streamlit.app/" target="_blank" rel="noopener" class="btn btn-primary">在线 Demo ↗</a>
+      <a href="https://github.com/hyc1054432995/EvoFinAgent" target="_blank" rel="noopener" class="btn btn-ghost">GitHub 源码 ↗</a>
+      <a href="https://github.com/hyc1054432995/EvoFinAgent/blob/main/docs/ENGINEERING_LOG.md" target="_blank" rel="noopener" class="btn btn-text">工程日志 →</a>
+    </div>
+  </div>
+</section>
+
+<!-- ============ CONTACT ============ -->
+<footer id="contact" class="footer">
+  <div class="section-inner footer-inner">
+    <p class="footer-line">在找 AI Agent / FinTech 方向的实习机会 — 新加坡</p>
+    <div class="footer-links">
+      <a href="mailto:YUCHEN027@e.ntu.edu.sg">YUCHEN027@e.ntu.edu.sg</a>
+      <a href="https://github.com/hyc1054432995/EvoFinAgent" target="_blank" rel="noopener">GitHub</a>
+      <a href="www.linkedin.com/in/yuchenhuang027" target="_blank" rel="noopener">LinkedIn</a>
+    </div>
+  </div>
+</footer>
+
+<script src="script.js"></script>
+</body>
+</html>
