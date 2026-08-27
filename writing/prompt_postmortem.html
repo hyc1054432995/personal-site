@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>提示词不是玄学：一次从 0% 到 100%，又发现自己过拟合的实验 — Yuchen</title>
+<meta name="description" content="一份完整的提示词 A/B 实验记录：如何用数据驱动的方式把一个执行摘要的长度达标率从 0% 调到 100%，又如何发现整个实验建立在单一样本上，以及如何用数值判定表而不是模糊指令修好它。">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Serif:ital,wght@0,400;0,500;0,600;1,400&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../styles.css">
+<link rel="stylesheet" href="article.css">
+</head>
+<body>
+
+<nav class="topnav">
+  <a href="../index.html#top" class="brand">YC</a>
+  <div class="nav-links">
+    <a href="../index.html#project">项目</a>
+    <a href="../index.html#writing">文章</a>
+    <a href="../index.html#contact">联系</a>
+  </div>
+</nav>
+
+<article class="post">
+  <header class="post-header">
+    <p class="section-label">工程复盘 · Evo-FinAgent</p>
+    <h1>提示词不是玄学：<br>一次从 0% 到 100%，又发现自己过拟合的实验</h1>
+    <p class="post-dek">
+      给模型一个字数要求，它十次里十次都超标。改了四轮，达标率变成 100%。
+      然后我人工审了一遍报告，发现整个实验建立在一个样本上——修好长度问题的同时，
+      悄悄教会了模型编造错误的财务归因。
+    </p>
+    <p class="post-meta">2026-08 · Evo-FinAgent 项目工程日志节选</p>
+  </header>
+
+  <div class="post-body">
+
+    <p>
+      Evo-FinAgent 是一个输入美股 ticker、自动生成投研报告的 Multi-Agent 系统。
+      最后一个节点负责把财务数据、估值倍数、风险摘要压缩成一段 220–300 字的执行摘要。
+      提示词里明明白白写着字数要求，但十次运行里，十次都超标——最长的一次写到了 452 字，
+      接近上限的两倍。
+    </p>
+
+    <h2>起点：字数要求写得清清楚楚，模型不听</h2>
+    <p>
+      最初的版本只在提示词末尾加一句"220 到 300 字"。跑十次，字数在 380–450
+      之间徘徊，<strong>没有一次落进目标区间</strong>。这不是文笔啰嗦的问题——
+      多出来的内容大多是重复表述、无意义的过渡句，模型显然没有把这句话当成
+      一个需要严格遵守的约束，更像是一个可以参考、可以超出的建议。
+    </p>
+    <p>
+      第一个假设：<strong>笼统的总量要求缺乏可跟踪的中间目标</strong>。模型写到一半，
+      没有办法判断"还剩多少字的额度"，自然容易写超。
+    </p>
+
+    <h2>假设一：把总字数拆成分段配额</h2>
+    <p>
+      把"220 到 300 字"换成五个部分、每部分给出具体字数（"盈利水平约 50 字，
+      财务结构约 90 字……"），让模型能随时对照进度。跑完对比，差点得出错误结论。
+    </p>
+    <table class="post-table">
+      <thead><tr><th>判定口径</th><th>旧版本</th><th>新版本</th><th>看起来</th></tr></thead>
+      <tbody>
+        <tr><td>评分脚本的宽松区间（200–420 字）</td><td>70%</td><td>80%</td><td>几乎没差别</td></tr>
+        <tr><td>提示词写明的真实目标（220–300 字）</td><td>0/10</td><td>6/10</td><td>效果显著</td></tr>
+      </tbody>
+    </table>
+    <p>
+      同一批输出，用两种口径判，得出相反的结论。我最初为了"轻微超标不该判定为不可用"，
+      把评分脚本的容忍区间放宽到了 200–420——这个理由本身没错，但它让指标失去了对
+      真实目标的分辨力。<strong>宽容的阈值适合判定"能不能用"，不适合判定"改进有没有效"，
+      这是两个不同的问题，不该共用同一把尺子。</strong>分开之后，新方案的效果才显现出来。
+    </p>
+
+    <h2>假设二：用实测数据反推参数，而不是再猜一次</h2>
+    <p>
+      分段配额定的是 260 字，实际输出均值只有 210.8 字——模型对配额的响应是打折的，
+      比值约 0.81。如果这个比值稳定，反推一下：想要均值落在目标区间中点 265 字，
+      配额应该设成 265 ÷ 0.81 ≈ 327，取整 330。
+    </p>
+    <p>
+      调整后重新跑十次，均值是 245.9 字，<strong>偏了 19 字，比值降到了 0.745。</strong>
+      这次的教训很直接：<strong>单个数据点算出的比值不能当线性关系外推</strong>——
+      模型对配额的响应本身就不是线性的，配额加大 27%，实际输出只多了 15%。
+      后续如果还要调，得用逐步逼近，不能指望一次算准。
+    </p>
+
+    <h2>补齐最后一块：从"合规"到"有信息量"</h2>
+    <p>
+      长度达标了，但护栏指标——回答质量是否够扎实——出现了下降：模型开始写出
+      "可能源于权益基数较小，需补充数据确认"这种正确但空洞的句子，缺了具体的
+      备选成因。人工比对发现，问题不在配额，而在指令里少了"必须列举 2–3 个
+      具体成因"这一句。补上之后，最终结果：
+    </p>
+    <table class="post-table">
+      <thead><tr><th>指标</th><th>原始版本</th><th>迭代五轮后</th><th>变化</th></tr></thead>
+      <tbody>
+        <tr><td>目标达标率（220–300 字）</td><td>0%</td><td>100%</td><td>+100pp</td></tr>
+        <tr><td>可用率（通过全部硬性检查）</td><td>60%</td><td>100%</td><td>+40pp</td></tr>
+        <tr><td>LLM 判官 · 信息量评分</td><td>2.40 / 3</td><td>3.00 / 3</td><td>+0.60</td></tr>
+        <tr><td>字数标准差（越低越稳定）</td><td>20.7</td><td>12.1</td><td>更稳定</td></tr>
+        <tr><td>单次调用成本</td><td>$0.000167</td><td>$0.000164</td><td>-2%</td></tr>
+      </tbody>
+    </table>
+    <p>
+      五轮迭代，字数达标率从 0% 到 100%，信息量不降反升，成本还略微下降。
+      到这一步，我把这个结果当成了定论。
+    </p>
+
+    <h2>转折：这套结论建立在一个样本上</h2>
+    <p>
+      上面所有实验，测试样本自始至终只有苹果一家公司。选它是因为跑起来方便——
+      它的快照已经有了。但苹果恰好有一个真实的财务异常：ROE 151.91%、
+      资产负债率 79.48%，两者同源于长期股票回购压缩了所有者权益。
+      "高 ROE 搭配高负债，可能是权益被压缩"这套解释在苹果身上完全成立，
+      于是这句话被我写进了提示词的规则示例里。
+    </p>
+    <p>
+      我拿修好的提示词跑了一次特斯拉，人工读报告时发现了这一句：
+    </p>
+    <blockquote>
+      "低ROE与较高资产负债率可能同源于权益基数变化，备选成因包括举债扩张、
+      股票回购减少权益或经营性负债占比较高……"
+    </blockquote>
+    <p>
+      特斯拉的 ROE 是 4.62%——偏低，不是偏高。举债扩张和股票回购会<strong>压缩</strong>
+      所有者权益，从而<strong>推高</strong> ROE，不会把它压低。这句话的因果方向是反的，
+      是苹果那套解释被原样套用到了一个方向相反的公司身上。
+    </p>
+    <p>
+      更值得记下来的是：<strong>负责打分的 LLM 判官给这段话打了本轮最高分。</strong>
+      它检查的是"有没有做关联分析、有没有列出成因"这个形式，不检查"归因方向
+      对不对"这个内容。评测体系本身有一个和提示词一样的盲区——都在单一样本上
+      验证过，都没被真正检验过是否能泛化。
+    </p>
+
+    <h2>修复尝试一：让模型自己判断，结果全面倒退</h2>
+    <p>
+      第一版修复思路：既然模板不能到处套用，那就让模型自己先判断"这家公司是否
+      真的存在异常"，异常才展开归因，不异常就如实说明。听起来是合理的补丁。
+    </p>
+    <p>
+      在三家公司上各跑六次，结果是三个样本全部劣于修复前的版本——不是取舍，
+      是净损失：
+    </p>
+    <table class="post-table">
+      <thead><tr><th>样本</th><th>修复前信息量</th><th>修复后信息量</th><th>变化</th></tr></thead>
+      <tbody>
+        <tr><td>AAPL（真实存在异常）</td><td>3.00</td><td>2.67</td><td>-0.33</td></tr>
+        <tr><td>TSLA（此前归因方向错误）</td><td>2.50</td><td>1.00</td><td>-1.50</td></tr>
+        <tr><td>MSFT（财务结构正常）</td><td>2.83</td><td>1.00</td><td>-1.83</td></tr>
+      </tbody>
+    </table>
+    <p>
+      "是否存在异常"是一道没有客观答案的主观题。模型在缺乏同业基准的情况下，
+      系统性地选择了成本最低的回避策略——三个样本里出现了大量"财务结构未见
+      明显异常"这类填充句。<strong>更麻烦的是，特斯拉那句本该修好的错误归因，
+      并没有变成正确的归因，而是被"什么都不判断"取代了</strong>——问题没解决，
+      只是换了一种方式没解决。
+    </p>
+
+    <h2>修复尝试二：把主观判断换成数值判定表</h2>
+    <p>
+      "判断是否异常"是模型没法可靠完成的任务，那就不让它判断。改成一张
+      具体到数字的判定表：
+    </p>
+    <ul class="post-list">
+      <li>ROE 高于 60%：判定为偏高，列举备选成因（举债扩张 / 回购 / 经营性负债占比高）</li>
+      <li>ROE 在 5%–60% 之间：常见区间，直接陈述数值，不加填充句</li>
+      <li>PE 高于 80 倍且净利率低于 10%：<strong>必须</strong>指出高倍数源于净利润基数
+        偏低对分母的放大效应，与盈利段的净利率数字相呼应</li>
+      <li>其余情况：仅陈述数值</li>
+    </ul>
+    <p>模型不再需要自己拿主意，只需要核对数字落在哪个区间。在三家公司上验证：</p>
+    <ul class="post-list">
+      <li><strong>AAPL</strong>（ROE 151.91% &gt; 60%）→ 正确触发权益偏低归因，与最初结果一致</li>
+      <li><strong>TSLA</strong>（PE 364.61 &gt; 80，净利率 4.00% &lt; 10%）→ 正确触发估值关联，
+        输出："因PE远超80倍且净利率低于10%，该市盈率畸高主要源于净利润基数偏低对分母
+        的放大效应，<strong>与前述4.00%的净利率互为同一成因的两种表现</strong>"</li>
+      <li><strong>MSFT</strong>（ROE 30.23%、PE 27.30，均落常见区间）→ 正确地不做归因，
+        直接陈述数值</li>
+    </ul>
+    <p>
+      三个分支，三个样本，全部命中。特斯拉那句错误归因被替换成了方向正确、
+      而且补上了此前七轮实验都没做到的一个关联——净利率过低正是市盈率畸高的
+      同一个成因，这两件事本该被连起来讲。
+    </p>
+    <p>
+      顺带一提：MSFT 在这一版的信息量评分反而更低了——因为它正确地拒绝编造一个
+      不存在的关联。<strong>这恰好是自动化评分标准本身的局限：它默认"找到关联"
+      才算高分，而对一家财务结构本来就正常的公司，"如实说明没有异常"才是
+      正确答案。</strong>这个局限被记进了项目的已知问题清单，留给后续接入同业对比
+      数据时一并解决，没有在这一轮里强行修补。
+    </p>
+
+    <h2>留下的几条判断</h2>
+    <ol class="post-list post-list-num">
+      <li>
+        <strong>在单一样本上调好的提示词，是过拟合，不是改进。</strong>
+        这条机器学习里最基础的常识，在提示词工程里同样成立，而且更隐蔽——
+        没有 loss 曲线提醒你，只有换一家公司跑一次才会现形。
+      </li>
+      <li>
+        <strong>评测口径必须和真实目标一致，否则会得出相反的结论。</strong>
+        同一批数据，宽松区间说效果不明显，严格区间说效果显著——这次的差异
+        不是噪声，是尺子本身选错了。
+      </li>
+      <li>
+        <strong>可执行的判定表比让模型自己判断更可靠。</strong>
+        "先判断是否异常"是一道主观题，模型会挑成本最低的答案；把判断标准
+        换成具体数值区间，模型只需要核对数字落在哪一档。
+      </li>
+      <li>
+        <strong>自动化评分抓不住"语义方向对不对"，人工审阅目前无法替代。</strong>
+        代码能检查有没有编造数字、有没有给投资建议；LLM 判官能检查有没有做
+        关联分析。但"这个关联的因果方向是否成立"，这次是靠人读出来的。
+      </li>
+    </ol>
+
+    <p class="post-footnote">
+      本文涉及的全部实验数据（每一轮的原始输出、判官打分理由、成本明细）都在
+      项目仓库的 <code>evals/results/</code> 目录下，实验可复现。完整的踩坑记录见
+      <a href="https://github.com/hyc1054432995/EvoFinAgent/blob/master/docs/ENGINEERING_LOG.md" target="_blank" rel="noopener">工程日志</a>。
+    </p>
+  </div>
+
+  <div class="post-back">
+    <a href="../index.html#project" class="btn btn-ghost">← 返回 Evo-FinAgent 项目</a>
+  </div>
+</article>
+
+<footer class="footer">
+  <div class="section-inner footer-inner">
+    <p class="footer-line">在找 AI Agent / FinTech 方向的实习机会 — 新加坡</p>
+    <div class="footer-links">
+      <a href="mailto:YUCHEN027@e.ntu.edu.sg">YUCHEN027@e.ntu.edu.sg</a>
+      <a href="https://github.com/hyc1054432995/EvoFinAgent" target="_blank" rel="noopener">GitHub</a>
+      <a href="https://www.linkedin.com/in/yuchenhuang027" target="_blank" rel="noopener">LinkedIn</a>
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>

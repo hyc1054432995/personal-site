@@ -1,0 +1,105 @@
+/* 文章页排版 —— 复用 styles.css 的色板与字体 token，
+   这里只加长文阅读需要的排版规则：控制行宽、表格、引用块、列表。 */
+
+   .post {
+    max-width: 720px;
+    margin: 0 auto;
+    padding: 72px 32px 96px;
+  }
+  
+  .post-header { margin-bottom: 48px; }
+  .post-header h1 {
+    font-family: var(--font-serif);
+    font-weight: 500;
+    font-size: clamp(28px, 4vw, 40px);
+    line-height: 1.25;
+    margin: 12px 0 20px;
+    color: var(--ink-text);
+  }
+  .post-dek {
+    font-size: 17px;
+    color: var(--ink-text-soft);
+    line-height: 1.6;
+    margin: 0 0 16px;
+  }
+  .post-meta {
+    font-family: var(--font-mono);
+    font-size: 12.5px;
+    color: var(--ink-text-soft);
+    margin: 0;
+    padding-top: 16px;
+    border-top: 1px solid var(--line-soft);
+  }
+  
+  .post-body { font-size: 16px; line-height: 1.75; }
+  .post-body h2 {
+    font-family: var(--font-serif);
+    font-weight: 500;
+    font-size: 24px;
+    margin: 52px 0 18px;
+    color: var(--ink-text);
+  }
+  .post-body p { margin: 0 0 20px; }
+  .post-body strong { color: var(--stamp); font-weight: 600; }
+  
+  .post-body blockquote {
+    margin: 24px 0;
+    padding: 16px 20px;
+    background: #E4E0D3;
+    border-left: 3px solid var(--stamp);
+    border-radius: 0 4px 4px 0;
+    font-family: var(--font-mono);
+    font-size: 14.5px;
+    line-height: 1.7;
+    color: var(--ink-text);
+  }
+  
+  .post-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 8px 0 28px;
+    font-size: 14.5px;
+  }
+  .post-table th, .post-table td {
+    text-align: left;
+    padding: 10px 14px;
+    border-bottom: 1px solid var(--line-soft);
+  }
+  .post-table th {
+    font-family: var(--font-mono);
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--ink-text-soft);
+    font-weight: 500;
+  }
+  .post-table td:not(:first-child) { font-family: var(--font-mono); }
+  
+  .post-list { padding-left: 22px; margin: 0 0 24px; }
+  .post-list li { margin-bottom: 12px; }
+  .post-list-num { padding-left: 24px; }
+  
+  .post-body code {
+    font-family: var(--font-mono);
+    font-size: 0.9em;
+    background: #E4E0D3;
+    padding: 2px 6px;
+    border-radius: 3px;
+  }
+  
+  .post-footnote {
+    margin-top: 44px;
+    padding-top: 24px;
+    border-top: 1px solid var(--line-soft);
+    font-size: 14px;
+    color: var(--ink-text-soft);
+  }
+  .post-footnote a { color: var(--verify); text-decoration: underline; text-underline-offset: 2px; }
+  
+  .post-back { max-width: 720px; margin: 0 auto; padding: 0 32px 64px; }
+  
+  @media (max-width: 560px) {
+    .post { padding: 48px 20px 64px; }
+    .post-table { font-size: 13px; }
+    .post-table th, .post-table td { padding: 8px 10px; }
+  }
